@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f8f5ff;
+  --foreground: #1a0a2e;
+  --theme-primary: #1a0a2e;
+  --theme-secondary: #4c1d95;
+  --theme-muted: #7c3aed99;
+  --theme-input: rgba(0, 0, 0, 0.04);
+  --theme-border: rgba(124, 58, 237, 0.25);
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(124, 58, 237, 0.15);
+  --page-gradient: linear-gradient(
+    135deg,
+    #faf5ff 0%,
+    #ede9fe 35%,
+    #fce7f3 70%,
+    #f5f3ff 100%
+  );
+}
+
+.dark {
+  --background: #0f0a1a;
+  --foreground: #f5f0ff;
+  --theme-primary: #f5f0ff;
+  --theme-secondary: #e9d5ffcc;
+  --theme-muted: #c4b5fd80;
+  --theme-input: rgba(0, 0, 0, 0.3);
+  --theme-border: rgba(168, 85, 247, 0.3);
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --page-gradient: linear-gradient(
+    135deg,
+    #1a0a2e 0%,
+    #2d1b4e 35%,
+    #4a1942 70%,
+    #1a0a2e 100%
+  );
+}
+
+body {
+  color: var(--foreground);
+  background: var(--page-gradient);
+  min-height: 100vh;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+@layer utilities {
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+  }
+
+  .gradient-text {
+    background: linear-gradient(90deg, #6b21a8, #c026d3, #7c3aed);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .dark .gradient-text {
+    background: linear-gradient(90deg, #e9d5ff, #f0abfc, #c4b5fd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-theme-primary {
+    color: var(--theme-primary);
+  }
+
+  .text-theme-secondary {
+    color: var(--theme-secondary);
+  }
+
+  .text-theme-muted {
+    color: var(--theme-muted);
+  }
+
+  .bg-theme-input {
+    background: var(--theme-input);
+  }
+
+  .border-theme-border {
+    border-color: var(--theme-border);
+  }
+}

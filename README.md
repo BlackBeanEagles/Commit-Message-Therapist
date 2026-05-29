@@ -11,6 +11,72 @@ AI therapist analyzes your Git history and generates witty mental health diagnos
 
 ---
 
+## What this project does
+
+**Commit Message Therapist** is a web app that analyzes a **public GitHub repository** and produces a structured **developer wellness report** from real commit history.
+
+Users paste a repo URL. The app clones commit history (last ~500 commits), computes objective Git metrics (late-night work, weekends, merges, frustration keywords, burnout risk), and uses **Claude** to generate a readable diagnosis with severity, suggestions, and shareable output. No GitHub login or wallet is required.
+
+Built for the **Injective Solo AI Builder Sprint** — an AI-first developer tool that turns invisible coding patterns into something teams can discuss.
+
+---
+
+## How users interact with it
+
+| Step | User action | What happens |
+|------|-------------|--------------|
+| 1 | Open the app | Landing page with **Analyze** and **Compare repos** tabs |
+| 2 | Paste a public GitHub URL | e.g. `https://github.com/vitejs/vite` |
+| 3 | Click **Start therapy** (or Cmd/Ctrl+Enter) | Server clones history and runs analysis (~30–90s) |
+| 4 | View results | Metrics grid, burnout score, severity badge, Claude diagnosis, suggestions |
+| 5 | Share or export | Copy share link (`/r/{id}`), copy diagnosis, or post to X |
+| 6 | *(Optional)* **Compare repos** | Enter two URLs → side-by-side metrics and diagnoses |
+| 7 | *(Optional)* Featured examples / newsletter | One-click demo repos; optional email signup |
+
+**Requirements for users:** A public GitHub repo URL and a modern browser. The server needs **Git** installed for cloning.
+
+---
+
+## How AI is used
+
+AI is **not** used to guess metrics — Git computes those deterministically. **Anthropic Claude** is used only for the **natural-language diagnosis layer**.
+
+### What is not AI
+- Commit counts, late-night %, weekend %, merge counts, author stats, burnout score (1–10)
+- All computed by `lib/git-analyzer.ts` from parsed Git log data
+
+### What Claude does
+1. Receives a **structured payload**: full metrics JSON + sample commit messages from the repo
+2. Gets a **fixed prompt** asking for a therapy-style diagnosis tied to those numbers (not open-ended chat)
+3. Returns **strict JSON**: emoji, title, multi-paragraph diagnosis, severity (`mild` → `critical`), actionable suggestions, tweet summary
+4. **Model fallback**: tries `CLAUDE_MODEL` from env, then `claude-sonnet-4-6` if the preferred model fails
+5. **Fallback mode**: if no `ANTHROPIC_API_KEY`, a rule-based template diagnosis is used so demos still work
+
+```mermaid
+flowchart LR
+  GitHub[GitHub repo] --> Metrics[Git metrics engine]
+  Metrics --> Prompt[Structured Claude prompt]
+  Prompt --> Claude[Anthropic Claude API]
+  Claude --> UI[Diagnosis + suggestions]
+```
+
+**Why this design:** Every claim in the diagnosis should trace back to real repo numbers — AI interprets data, it does not invent it.
+
+---
+
+## Injective integration
+
+| Question | Answer |
+|----------|--------|
+| **Is Injective integrated?** | **No on-chain integration** in the current version |
+| **Relation to Injective** | Submitted as an entry for the **Injective Solo AI Builder Sprint** |
+| **Wallet / smart contracts** | Not used — no Injective SDK, wallet connect, or chain transactions |
+| **Future fit** | Diagnosis results could be anchored on-chain (e.g. verifiable repo wellness attestations) or tied to Injective ecosystem tooling in a later iteration |
+
+This sprint focuses on **AI + Git analysis** as a standalone developer tool. Injective is the **hackathon context**, not a runtime dependency.
+
+---
+
 ## Motivation
 
 Developers leave emotional fingerprints in Git: late-night commits, weekend pushes, merge-conflict rage, and messages like `fix fix fix please work`. Those patterns are real signals of workload and stress — but they are buried in thousands of commits and rarely discussed in retros.
@@ -120,16 +186,7 @@ sequenceDiagram
 4. **Generate diagnosis** — Metrics sent to Claude with a strict JSON schema; fallback rules if no API key.
 5. **Present & share** — Dashboard with severity badges; optional permalink via `/r/{id}`.
 
----
-
-## How Claude AI is used
-
-Claude is not a free-form chatbot here — it is a **structured diagnosis engine** fed by real repo data:
-
-1. **Git analysis engine** clones the repo (shallow, last 500 commits) and computes metrics: late-night commits, weekend work, merge conflicts, frustration keywords, author patterns, burnout risk (1–10).
-2. **Metrics + sample commit messages** are sent in a single prompt so every claim ties back to actual numbers.
-3. **Claude returns JSON**: emoji, title, multi-paragraph diagnosis, severity (`mild` → `critical`), suggestions, and a tweet-ready summary.
-4. **Fallback mode** works without an API key (rule-based diagnosis) so the app still runs for demos and local testing.
+> See **How AI is used** and **How users interact with it** above for submission-ready summaries.
 
 ---
 

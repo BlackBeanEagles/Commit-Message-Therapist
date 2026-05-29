@@ -7,13 +7,15 @@ import type { AnalysisResult } from "./types";
 const cache = new Map<string, { result: AnalysisResult; expiresAt: number }>();
 
 const TTL_MS = 1000 * 60 * 60; // 1 hour
+/** Bump when diagnosis pipeline changes to invalidate stale cached results */
+const CACHE_VERSION = "v2";
 
 function normalizeRepoUrl(url: string): string {
-  return url
+  return `${CACHE_VERSION}:${url
     .trim()
     .toLowerCase()
     .replace(/\.git$/, "")
-    .replace(/\/$/, "");
+    .replace(/\/$/, "")}`;
 }
 
 export function getCachedAnalysis(repoUrl: string): AnalysisResult | null {

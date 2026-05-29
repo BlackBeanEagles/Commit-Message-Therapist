@@ -68,16 +68,27 @@ function mergeKeywordCounts(
   }
 }
 
+/**
+ * Bare clone: history only, no working tree checkout.
+ * Avoids Windows MAX_PATH failures on repos with very deep paths (e.g. vercel/next.js).
+ */
 async function cloneRepository(cloneUrl: string, destDir: string): Promise<void> {
-  await fs.mkdir(destDir, { recursive: true });
-  await execFileAsync("git", [
-    "clone",
-    "--depth",
-    "500",
-    "--single-branch",
-    cloneUrl,
-    destDir,
-  ], { timeout: 120_000 });
+  await fs.mkdir(path.dirname(destDir), { recursive: true });
+  await execFileAsync(
+    "git",
+    [
+      "-c",
+      "core.longpaths=true",
+      "clone",
+      "--bare",
+      "--depth",
+      "500",
+      "--single-branch",
+      cloneUrl,
+      destDir,
+    ],
+    { timeout: 120_000 }
+  );
 }
 
 export async function analyzeRepository(

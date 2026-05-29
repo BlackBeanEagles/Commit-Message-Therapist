@@ -20,6 +20,9 @@ export function LoadingState() {
           Cloning Git history, reading commit messages, and preparing your therapy
           session. This usually takes 30–60 seconds.
         </p>
+        <p className="text-xs text-theme-muted">
+          Soothing therapy music plays in the background — toggle with the note icon (top left).
+        </p>
       </div>
       <div className="flex gap-2 mt-4">
         {[0, 1, 2, 3].map((i) => (

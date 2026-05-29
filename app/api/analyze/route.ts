@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const repoUrl = typeof body?.repoUrl === "string" ? body.repoUrl : "";
+    const forceRefresh = body?.forceRefresh === true;
 
     if (!repoUrl.trim()) {
       return NextResponse.json(
@@ -33,17 +34,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const cached = getCachedAnalysis(parsed.displayUrl);
-    if (cached) {
-      return NextResponse.json(cached);
+    if (!forceRefresh) {
+      const cached = getCachedAnalysis(parsed.displayUrl);
+      if (cached) {
+        return NextResponse.json(cached);
+      }
     }
 
     const metrics = await analyzeRepository(parsed, parsed.displayUrl);
-    const diagnosis = await generateTherapyDiagnosis(metrics);
+    const { diagnosis, source } = await generateTherapyDiagnosis(metrics);
 
     const result = {
       metrics,
       diagnosis,
+      diagnosisSource: source,
       analyzedAt: new Date().toISOString(),
       cached: false,
     };
@@ -92,6 +96,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Analysis timed out. Try a smaller repository." },
         { status: 504 }
+      );
+    }
+
+    if (
+      message.includes("Filename too long") ||
+      message.includes("checkout failed")
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "This repository has paths that are difficult to clone on Windows. Try again — we use a history-only clone — or use a smaller repo for your demo.",
+        },
+        { status: 500 }
       );
     }
 

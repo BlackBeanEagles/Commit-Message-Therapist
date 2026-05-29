@@ -43,7 +43,7 @@ export default function HomePage() {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ repoUrl: trimmed }),
+        body: JSON.stringify({ repoUrl: trimmed, forceRefresh: true }),
       });
 
       const data = await res.json();

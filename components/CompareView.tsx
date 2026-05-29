@@ -15,7 +15,7 @@ async function fetchAnalysis(repoUrl: string): Promise<AnalysisResult> {
   const res = await fetch("/api/analyze", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ repoUrl }),
+    body: JSON.stringify({ repoUrl, forceRefresh: true }),
   });
   const data = await res.json();
   if (!res.ok) {

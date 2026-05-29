@@ -47,4 +47,6 @@ export interface AnalysisResult {
   diagnosis: TherapyDiagnosis;
   analyzedAt: string;
   cached: boolean;
+  /** Whether Claude or rule-based fallback produced the diagnosis */
+  diagnosisSource?: "claude" | "fallback";
 }
